@@ -26,8 +26,9 @@ export interface DiscoveryResult {
 
 export const discoverProviders = async (
   serviceType: string,
-  userLat: number = 33.6454, // Changed to match G-13 coordinates
-  userLng: number = 72.9868,
+  userLat: number,
+  userLng: number,
+  availableProviders: Provider[],
   radiusKm: number = 5,
   wasExpanded: boolean = false
 ): Promise<DiscoveryResult> => {
@@ -40,7 +41,7 @@ export const discoverProviders = async (
   // Edge case handle mapping of intent service type to mock provider service type
   const normalizedServiceType = serviceType.toLowerCase();
 
-  for (const provider of MOCK_PROVIDERS) {
+  for (const provider of availableProviders) {
     // Basic service type matching
     if (provider.service_type.toLowerCase().includes(normalizedServiceType) || 
         normalizedServiceType.includes(provider.service_type.toLowerCase())) {
@@ -58,8 +59,8 @@ export const discoverProviders = async (
 
   // Edge case 2: If Discovery Agent returns length === 0, auto-expand search radius by +5km increments up to 50km
   if (discovered.length === 0 && radiusKm < 50) {
-    console.log(`[DISCOVERY_AGENT] No providers found in ${radiusKm}km radius. Expanding radius to ${radiusKm + 5}km...`);
-    return await discoverProviders(serviceType, userLat, userLng, radiusKm + 5, true);
+    console.log(`[DISCOVERY_AGENT] No providers found in \${radiusKm}km radius. Expanding radius to \${radiusKm + 5}km...`);
+    return await discoverProviders(serviceType, userLat, userLng, availableProviders, radiusKm + 5, true);
   }
 
   return { providers: discovered, expanded_search: wasExpanded };

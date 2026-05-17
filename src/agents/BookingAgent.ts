@@ -9,12 +9,13 @@ export interface BookingReceipt {
   timestamp: string; 
 }
 
-export const simulateBooking = async (provider: Provider): Promise<BookingReceipt> => {
+export const simulateBooking = async (provider: Provider & { distance_km?: number }): Promise<BookingReceipt> => {
   // Simulate network transaction latency (< 200ms based on Phase 1 benchmarks)
   await new Promise(resolve => setTimeout(resolve, 150));
 
   const bookingId = "HZR-" + Math.random().toString(36).substring(7).toUpperCase();
-  const eta = Math.floor(Math.random() * (45 - 15 + 1)) + 15; // Random between 15 and 45
+  const distance = provider.distance_km || 5;
+  const eta = Math.round(distance * 2) + 5; // 30 km/h = 2 min/km + 5 min buffer
 
   console.log(`[BOOKING_AGENT] Booking confirmed: ${bookingId} for ${provider.name}`);
 

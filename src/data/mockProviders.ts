@@ -7,41 +7,36 @@ export interface Provider {
   rating: number;
   completed_jobs: number;
   is_available: boolean;
+  avatar_url: string;
 }
 
-// Center around Islamabad G-13 (approx: 33.6454, 72.9868)
-export const MOCK_PROVIDERS: Provider[] = [
-  // Plumbers
-  { id: 'p1', name: 'Ali Raza', service_type: 'Plumbing', base_lat: 33.6460, base_lng: 72.9870, rating: 4.8, completed_jobs: 120, is_available: true },
-  { id: 'p2', name: 'Zahid Khan', service_type: 'Plumbing', base_lat: 33.6440, base_lng: 72.9880, rating: 4.2, completed_jobs: 45, is_available: true },
-  { id: 'p3', name: 'Umer Farooq', service_type: 'Plumbing', base_lat: 33.6480, base_lng: 72.9850, rating: 4.9, completed_jobs: 300, is_available: true },
-  { id: 'p4', name: 'Bilal Ahmed', service_type: 'Plumbing', base_lat: 33.6420, base_lng: 72.9890, rating: 3.5, completed_jobs: 12, is_available: true },
-  { id: 'p5', name: 'Qasim Ali', service_type: 'Plumbing', base_lat: 33.6470, base_lng: 72.9830, rating: 4.6, completed_jobs: 198, is_available: true },
-  { id: 'p6', name: 'Tariq Mehmood', service_type: 'Plumbing', base_lat: 33.6430, base_lng: 72.9860, rating: 3.9, completed_jobs: 27, is_available: true },
+export const MOCK_PROVIDERS: Provider[] = [];
+
+export const generateProvidersForLocation = (lat: number, lng: number, count = 15): Provider[] => {
+  // Pakistan approximate bounding box safety guard
+  const safeLat = Math.max(23.6, Math.min(37.1, lat));
+  const safeLng = Math.max(60.8, Math.min(77.8, lng));
+
+  const providers: Provider[] = [];
+  const names = ['Ali Raza', 'Zahid Khan', 'Umer Farooq', 'Bilal Ahmed', 'Qasim Ali', 'Tariq Mehmood', 'Kamran', 'Faizan Tariq', 'Imran Shah', 'Tahir Mehmood', 'Saima Bibi', 'Nadia Gul', 'Rizwan', 'Javed', 'Majeed', 'Salman', 'Irfan'];
+  const services = ['Plumbing', 'Electrical', 'Cleaning', 'AC Technician', 'Carpentry', 'Appliance Care'];
   
-  // Electricians
-  { id: 'e1', name: 'Kamran Electrician', service_type: 'Electrical', base_lat: 33.6450, base_lng: 72.9860, rating: 4.5, completed_jobs: 89, is_available: true },
-  { id: 'e2', name: 'Faizan Tariq', service_type: 'Electrical', base_lat: 33.6470, base_lng: 72.9840, rating: 4.7, completed_jobs: 210, is_available: true },
-  { id: 'e3', name: 'Imran Shah', service_type: 'Electrical', base_lat: 33.6430, base_lng: 72.9890, rating: 4.0, completed_jobs: 34, is_available: false },
-  { id: 'e4', name: 'Tahir Mehmood', service_type: 'Electrical', base_lat: 33.6490, base_lng: 72.9820, rating: 4.9, completed_jobs: 450, is_available: true },
-  { id: 'e5', name: 'Usman Jamil', service_type: 'Electrical', base_lat: 33.6465, base_lng: 72.9850, rating: 4.1, completed_jobs: 60, is_available: true },
-  { id: 'e6', name: 'Hassan Raza', service_type: 'Electrical', base_lat: 33.6445, base_lng: 72.9885, rating: 4.8, completed_jobs: 310, is_available: true },
-  { id: 'e7', name: 'Waqas Ahmad', service_type: 'Electrical', base_lat: 33.6485, base_lng: 72.9810, rating: 3.8, completed_jobs: 15, is_available: true },
-
-  // Cleaners
-  { id: 'c1', name: 'Saima Bibi', service_type: 'Cleaning', base_lat: 33.6465, base_lng: 72.9865, rating: 4.6, completed_jobs: 150, is_available: true },
-  { id: 'c2', name: 'Asma Cleaning Services', service_type: 'Cleaning', base_lat: 33.6445, base_lng: 72.9875, rating: 4.3, completed_jobs: 78, is_available: true },
-  { id: 'c3', name: 'Nadia Gul', service_type: 'Cleaning', base_lat: 33.6485, base_lng: 72.9845, rating: 4.8, completed_jobs: 320, is_available: true },
-  { id: 'c4', name: 'Shazia Housekeeping', service_type: 'Cleaning', base_lat: 33.6425, base_lng: 72.9895, rating: 4.1, completed_jobs: 22, is_available: true },
-  { id: 'c5', name: 'Farah Cleaners', service_type: 'Cleaning', base_lat: 33.6475, base_lng: 72.9825, rating: 4.9, completed_jobs: 410, is_available: true },
-  { id: 'c6', name: 'Kiran Maid Services', service_type: 'Cleaning', base_lat: 33.6455, base_lng: 72.9880, rating: 3.7, completed_jobs: 30, is_available: true },
-
-  // AC Technicians
-  { id: 'a1', name: 'Rizwan AC Repair', service_type: 'AC Technician', base_lat: 33.6455, base_lng: 72.9855, rating: 4.7, completed_jobs: 190, is_available: true },
-  { id: 'a2', name: 'Cooling Masters (Usman)', service_type: 'AC Technician', base_lat: 33.6475, base_lng: 72.9835, rating: 4.4, completed_jobs: 110, is_available: true },
-  { id: 'a3', name: 'Javed AC Works', service_type: 'AC Technician', base_lat: 33.6435, base_lng: 72.9885, rating: 4.2, completed_jobs: 65, is_available: false },
-  { id: 'a4', name: 'Majeed Tech', service_type: 'AC Technician', base_lat: 33.6495, base_lng: 72.9815, rating: 4.9, completed_jobs: 500, is_available: true },
-  { id: 'a5', name: 'Sajid AC Expert', service_type: 'AC Technician', base_lat: 33.6460, base_lng: 72.9840, rating: 4.5, completed_jobs: 145, is_available: true },
-  { id: 'a6', name: 'Bismillah AC Repair', service_type: 'AC Technician', base_lat: 33.6480, base_lng: 72.9870, rating: 3.6, completed_jobs: 40, is_available: true },
-  { id: 'a7', name: 'Zain AC Mechanics', service_type: 'AC Technician', base_lat: 33.6420, base_lng: 72.9860, rating: 4.8, completed_jobs: 270, is_available: true }
-];
+  for (let i = 0; i < count; i++) {
+    const isMale = Math.random() > 0.3;
+    const g = isMale ? 'men' : 'women';
+    const num = Math.floor(Math.random() * 90) + 10;
+    
+    providers.push({
+      id: Math.random().toString(36).substring(7).toUpperCase(),
+      name: names[Math.floor(Math.random() * names.length)],
+      service_type: services[Math.floor(Math.random() * services.length)],
+      base_lat: safeLat + (Math.random() - 0.5) * 0.08,
+      base_lng: safeLng + (Math.random() - 0.5) * 0.08,
+      rating: parseFloat((Math.random() * (5.0 - 4.0) + 4.0).toFixed(1)),
+      completed_jobs: Math.floor(Math.random() * (450 - 10 + 1)) + 10,
+      is_available: Math.random() > 0.15,
+      avatar_url: `https://randomuser.me/api/portraits/${g}/${num}.jpg`
+    });
+  }
+  return providers;
+};
