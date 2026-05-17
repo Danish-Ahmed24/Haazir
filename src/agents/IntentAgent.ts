@@ -8,27 +8,37 @@ const SYSTEM_INSTRUCTION = `
 You are the Intent Agent for the "Haazir" mobile application. 
 Your job is to parse natural language service requests in English, Urdu, or Roman Urdu and extract structured information.
 
+IMPORTANT: You will receive the full conversation history between the user and the AI assistant. 
+You MUST accumulate entities across messages. If the user previously mentioned a service or location, 
+DO NOT forget it. Merge all information gathered across the conversation into one complete payload.
+
 Return a JSON object strictly matching this TypeScript interface:
 interface IntentPayload {
-  is_complete: boolean; // false if location/time/service is missing
+  is_complete: boolean; // false if location/time/service is STILL missing after merging all messages
   service_type: 'Plumbing' | 'Electrical' | 'Cleaning' | 'AC Technician' | null;
   location: string | null;
   time_preference: string | null;
   language: 'English' | 'Urdu' | 'Roman Urdu';
-  clarification_question?: string; // required if is_complete is false. Must be in the user's detected language.
+  clarification_question?: string; // required if is_complete is false. Must be in the user's detected language. Only ask about the REMAINING missing fields.
 }
 
 Examples:
-Input: "Mujhe kal subah G-13 mein AC technician chahiye"
+
+Conversation:
+User: "Mujhe G-13 mein AC theek karwana hai"
+AI: "Aapko kis waqt technician chahiye?"
+User: "9 baje"
+
 Output: {
   "is_complete": true,
   "service_type": "AC Technician",
   "location": "G-13, Islamabad",
-  "time_preference": "Morning, Tomorrow",
+  "time_preference": "9:00",
   "language": "Roman Urdu"
 }
 
-Input: "AC kharab hai"
+Single message example:
+User: "AC kharab hai"
 Output: {
   "is_complete": false,
   "service_type": "AC Technician",
@@ -41,7 +51,15 @@ Output: {
 Always output valid JSON only, without markdown wrapping or backticks.
 `;
 
-export const analyzeIntent = async (query: string): Promise<IntentPayload> => {
+export interface ConversationTurn {
+  role: 'user' | 'ai';
+  content: string;
+}
+
+export const analyzeIntent = async (
+  query: string,
+  conversationHistory: ConversationTurn[] = []
+): Promise<IntentPayload> => {
   if (!process.env.EXPO_PUBLIC_GEMINI_API_KEY) {
     throw new Error('Missing Gemini API Key');
   }
@@ -55,8 +73,20 @@ export const analyzeIntent = async (query: string): Promise<IntentPayload> => {
     }
   });
 
+  // Build multi-turn prompt with full conversation context
+  let contextPrompt = '';
+  if (conversationHistory.length > 0) {
+    contextPrompt = 'Conversation so far:\n';
+    for (const turn of conversationHistory) {
+      contextPrompt += `${turn.role === 'user' ? 'User' : 'AI'}: "${turn.content}"\n`;
+    }
+    contextPrompt += `\nUser: "${query}"\n\nAnalyze the FULL conversation above and return the merged intent payload.`;
+  } else {
+    contextPrompt = query;
+  }
+
   try {
-    const result = await model.generateContent(query);
+    const result = await model.generateContent(contextPrompt);
     const text = result.response.text();
     const payload: IntentPayload = JSON.parse(text);
     return payload;
