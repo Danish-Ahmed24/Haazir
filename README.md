@@ -131,6 +131,13 @@ react-native-service/
 
 ---
 
+## 📄 Logs & Traces
+
+The project includes a `logs/` directory that stores complete conversational traces and execution summaries generated during the AI-driven development and orchestration phases. 
+- `logs/overview.txt`: Contains full chronological documentation of agent steps, commands executed, and system logic paths taken during application development.
+
+---
+
 ## 🎨 UI/UX Highlights
 
 - **Custom Cancel Flow:** A smart state machine that prevents accidental cancellations by requiring the user to select a reason before confirming.
